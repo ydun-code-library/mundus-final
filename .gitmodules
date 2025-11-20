@@ -1,0 +1,9 @@
+[submodule "repos/editor"]
+	path = repos/editor
+	url = git@github.com:ydun-code-library/mundus-production.git
+[submodule "repos/digest"]
+	path = repos/digest
+	url = git@github.com:ydun-code-library/digest-production.git
+[submodule "repos/prompt-lab"]
+	path = repos/prompt-lab
+	url = git@github.com:ydun-code-library/prompt-lab.git
