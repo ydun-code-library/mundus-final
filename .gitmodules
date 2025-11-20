@@ -7,3 +7,6 @@
 [submodule "repos/prompt-lab"]
 	path = repos/prompt-lab
 	url = git@github.com:ydun-code-library/prompt-lab.git
+[submodule "repos/supabase"]
+	path = repos/supabase
+	url = git@github.com:ydun-code-library/mundus-supabase.git

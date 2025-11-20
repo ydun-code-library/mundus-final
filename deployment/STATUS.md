@@ -7,11 +7,12 @@
 
 ## Deployment Status
 
-| App | Beast (web3studio.dev) | Render.com (Production) | Status |
-|-----|------------------------|-------------------------|--------|
+| App | Staging (web3studio.dev) | Render.com (Production) | Status |
+|-----|--------------------------|-------------------------|--------|
 | **Editor** | ⏳ Not deployed | ⏳ Not deployed | Ready |
 | **Digest** | ⏳ Not deployed | ⏳ Not deployed | Ready |
 | **Prompt Lab** | ⏳ Not deployed | ⏳ Not deployed | Ready |
+| **Supabase** | ✅ Active | ✅ Active | Production |
 
 ---
 

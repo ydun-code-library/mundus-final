@@ -1,42 +1,63 @@
-# Mundus Production Orchestration
+# Mundus Platform - Orchestration Hub
 
-**Purpose:** Meta-repository for managing 3 Mundus production applications during deployment
-**Operator:** Chromebook (Claude Code)
+**Purpose:** Coordinate deployment and maintenance for Mundus platform
 **Created:** 2025-11-20
-**Version:** 0.1.0
+**Version:** 1.0.0
+**Type:** Meta-orchestration workspace
 
 ---
 
 ## Overview
 
-This directory orchestrates deployment and troubleshooting for the complete Mundus platform ecosystem.
+This directory coordinates the complete Mundus platform consisting of 4 repositories:
 
-**Managed Applications (3):**
 1. **Editor** - Article management and AI writeup generation
-2. **Digest** - Daily digest automation with PDF generation
+2. **Digest** - Daily digest automation with PDF/email
 3. **Prompt Lab** - AI prompt testing and optimization
+4. **Supabase** - Edge Functions and database infrastructure
 
-**Deployment Strategy:**
-- **Phase 1:** Deploy to Beast (web3studio.dev via Cloudflare Tunnel) for testing
-- **Phase 2:** Deploy to Render.com for production client handoff
+**Purpose:**
+- Coordinate deployments across all repositories
+- Monitor application health
+- Troubleshoot cross-repository issues
+- Document deployment history
+- Manage staging and production environments
 
 ---
 
-## Directory Purpose
+## Platform Architecture
 
-**This is NOT application code** - it's an orchestration workspace.
+```
+┌────────────────────────────────────┐
+│  Editor Application ($7/month)     │
+│  - Article management              │
+│  - AI writeup generation           │
+│  - Admin dashboard                 │
+└───────────┬────────────────────────┘
+            ↓
+┌────────────────────────────────────┐
+│  Digest Application ($7/month)     │
+│  - Daily digest automation         │
+│  - PDF generation (bundled)        │
+│  - Email automation                │
+└───────────┬────────────────────────┘
+            ↓
+┌────────────────────────────────────┐
+│  Prompt Lab ($7/month)             │
+│  - AI prompt testing               │
+│  - Model configuration             │
+│  - Results comparison              │
+└───────────┬────────────────────────┘
+            ↓
+┌────────────────────────────────────┐
+│  Supabase Backend (managed)        │
+│  - PostgreSQL databases (2)        │
+│  - Edge Functions (5 deployed)     │
+│  - Automated content pipeline      │
+└────────────────────────────────────┘
+```
 
-**What happens here:**
-- Coordinate deployments across 3 repos
-- Troubleshoot production issues
-- Monitor deployment health
-- Create deployment specs
-- Cross-repo coordination
-
-**What does NOT happen here:**
-- No application development
-- No feature building
-- No direct code changes to production repos
+**Total Cost:** $21/month (+ Supabase usage)
 
 ---
 
@@ -44,203 +65,180 @@ This directory orchestrates deployment and troubleshooting for the complete Mund
 
 ```
 mundus-final/
-├── repos/                  # Git submodules (3 production repos)
-│   ├── editor/            → mundus-production
-│   ├── digest/            → digest-production
-│   └── prompt-lab/        → prompt-lab
+├── repos/                      # Git submodules
+│   ├── editor/                → mundus-production (GitHub)
+│   ├── digest/                → digest-production (GitHub)
+│   ├── prompt-lab/            → prompt-lab (GitHub)
+│   └── supabase/              → mundus-supabase (GitHub)
 │
-├── deployment/             # Deployment orchestration
-│   ├── web3studio/        # Beast deployment specs
-│   └── render/            # Render.com deployment specs
+├── deployment/                 # Deployment coordination
+│   ├── web3studio/            # Staging deployment specs
+│   ├── render/                # Production deployment specs
+│   └── STATUS.md              # Current deployment status
 │
-├── monitoring/             # Health checks and monitoring
-│   ├── check-all.sh       # Check all 3 apps
-│   └── logs/              # Deployment logs
+├── monitoring/                 # Platform monitoring
+│   ├── check-all.sh           # Health check all apps
+│   ├── logs/                  # Deployment history
+│   │   ├── deployment-history.log
+│   │   ├── fixes.log
+│   │   └── issues.log
+│   └── README.md
 │
-├── docs/                   # Orchestration documentation
+├── docs/                       # Orchestration guides
 │   ├── DEPLOYMENT-WORKFLOW.md
 │   ├── TROUBLESHOOTING.md
 │   └── ARCHITECTURE-OVERVIEW.md
 │
-├── CLAUDE.md               # How to operate this directory
-├── AGENTS.md               # Workflow and constraints
-├── README.md               # This file
-└── VERSION                 # 0.1.0
+├── CLAUDE.md                   # AI assistant context
+├── AGENTS.md                   # Current status & guidelines
+├── WORKFLOW.md                 # Red/Green Checkpoint methodology
+├── README.md                   # This file
+└── VERSION                     # 1.0.0
 ```
 
 ---
 
-## The 3 Production Applications
+## Quick Start
 
-### 1. Editor (mundus-production)
-- **Repository:** https://github.com/ydun-code-library/mundus-production
-- **Purpose:** Article management with AI writeup generation
-- **Stack:** Node.js + React + PostgreSQL
-- **Cost:** $7/month (Render)
-- **Developers:** Mansour (backend v3), Johan (frontend)
-- **Constraints:** ⚠️ Code preservation rules apply
-
-### 2. Digest (digest-production)
-- **Repository:** https://github.com/ydun-code-library/digest-production
-- **Purpose:** Daily digest automation with PDF/email
-- **Stack:** Node.js + React + digest-service + pdf-service (bundled)
-- **Cost:** $7/month (Render)
-- **Constraints:** ✅ Can modify freely (we own this)
-
-### 3. Prompt Lab (prompt-lab)
-- **Repository:** https://github.com/ydun-code-library/prompt-lab
-- **Purpose:** AI prompt testing and optimization
-- **Stack:** Node.js + Vanilla JS + Express
-- **Cost:** $7/month (Render)
-- **Constraints:** ✅ Can modify freely (we own this)
-
-**Total Infrastructure Cost:** $21/month
-
----
-
-## Deployment Workflow
-
-### Phase 1: Beast Testing (web3studio.dev)
-
-**Purpose:** Validate everything works before client handoff
-
-```
-Chromebook (this directory)
-    ↓ Create deployment specs
-Beast
-    ↓ Execute specs
-web3studio.dev (Cloudflare Tunnel)
-    ↓ Test all 3 apps
-Chromebook
-    ↓ Validate and approve
-```
-
-**Domains (Beast via Cloudflare):**
-- https://editor.web3studio.dev/
-- https://digest.web3studio.dev/
-- https://prompt-lab.web3studio.dev/
-
-### Phase 2: Render.com Production
-
-**After Beast validation:**
-
-```
-Push to production repos
-    ↓
-Render.com auto-deploy
-    ↓
-Production URLs live
-    ↓
-Client handoff complete
-```
-
-**Domains (Render.com):**
-- https://mundus-editor.onrender.com/
-- https://mundus-digest.onrender.com/
-- https://mundus-prompt-lab.onrender.com/
-
----
-
-## Operating from This Directory
-
-**See CLAUDE.md for detailed instructions.**
-
-**Quick Reference:**
-
-### Troubleshooting Production Issues
+### Check Platform Health
 
 ```bash
-# From this directory
-cd /home/jimmyb/m-e-p/mundus-final
+cd /path/to/mundus-final
 
-# Check all 3 apps
+# Check all applications
+./monitoring/check-all.sh
+```
+
+### Update All Repositories
+
+```bash
+# Pull latest from all repos
+cd repos/editor && git pull origin main
+cd ../digest && git pull origin main
+cd ../prompt-lab && git pull origin master
+cd ../supabase && git pull origin master
+```
+
+### Work on Specific Application
+
+```bash
+cd repos/editor      # Work on Editor
+cd repos/digest      # Work on Digest
+cd repos/prompt-lab  # Work on Prompt Lab
+cd repos/supabase    # Manage Supabase
+```
+
+---
+
+## Deployment Strategy
+
+### Phase 1: Staging (web3studio.dev)
+
+**Purpose:** Validate before production
+
+```bash
+# Deploy to staging environment
+# See deployment/web3studio/ for specs
+
+# Test all applications
 ./monitoring/check-all.sh
 
-# Work on specific app
-cd repos/editor      # Troubleshoot editor
-cd repos/digest      # Troubleshoot digest
-cd repos/prompt-lab  # Troubleshoot prompt-lab
+# Validate:
+# - All apps healthy
+# - Shared auth works
+# - Cross-navigation works
+# - Performance acceptable
 ```
 
-### Making Changes
-
-**Editor (repos/editor/):**
-- ⚠️ **Read CODE-PRESERVATION-RULES.md first!**
-- ⚠️ Don't change Mansour's backend v3
-- ⚠️ Don't change Johan's frontend
-- ✅ Can add tests, fix critical security issues only
-
-**Digest (repos/digest/):**
-- ✅ Can change freely (we own it)
-- ✅ Can refactor, optimize
-- ✅ Just don't break functionality
-
-**Prompt Lab (repos/prompt-lab/):**
-- ✅ Can change freely (we own it)
-- ✅ Can refactor, optimize
-- ✅ Just don't break functionality
-
 ---
 
-## Communication with Beast
+### Phase 2: Production (Render.com)
 
-**Via Tailscale:**
-- Chromebook can SSH to Beast: `ssh jamesb@beast`
-- Can deploy to Beast for testing
-- Can monitor Beast containers
-- Coordinate via GitHub (push specs → Beast pulls → executes)
-
----
-
-## Workflow
-
-**For Deployment Issues:**
-
-1. **Identify issue** in one of the 3 apps
-2. **Create fix spec** in this directory (deployment/specs/)
-3. **Test locally** if possible
-4. **Push spec to production repo**
-5. **Beast executes** (or manual fix)
-6. **Validate fix** works
-7. **Document** in monitoring/logs/
-
-**For Multi-Repo Coordination:**
-
-1. **Create orchestration spec** (affects multiple repos)
-2. **Execute from this directory**
-3. **Coordinate with Beast** via Tailscale/GitHub
-4. **Validate all 3 apps** still work together
-
----
-
-## Directory Initialization
+**Purpose:** Client-owned production deployment
 
 ```bash
-cd /home/jimmyb/m-e-p/mundus-final
+# After staging validation complete
+# See deployment/render/ for checklist
 
-# Add production repos as submodules
-git init
-git submodule add git@github.com:ydun-code-library/mundus-production.git repos/editor
-git submodule add git@github.com:ydun-code-library/digest-production.git repos/digest
-git submodule add git@github.com:ydun-code-library/prompt-lab.git repos/prompt-lab
+# Connect repos to Render
+# Configure environment variables
+# Enable auto-deploy
 
-# Initial commit
-git add .
-git commit -m "init: Mundus production orchestration directory"
+# Monitor deployment
+# Validate production URLs
 ```
 
 ---
 
-## Key Principles
+## Development Workflow
 
-1. **Chromebook is Orchestrator** for this directory
-2. **Beast is Executor** for heavy deployment work
-3. **Respect ownership** - Editor has preservation rules
-4. **Test on Beast first** before Render production
-5. **Document everything** - deployment logs, issues, decisions
+**All changes follow Red/Green Checkpoint methodology.**
+
+See `WORKFLOW.md` for complete guide.
+
+**Quick Summary:**
+1. 🔴 Implement change
+2. 🟢 Validate (run tests, checks)
+3. 🔵 Checkpoint (commit, document)
 
 ---
 
-**Status:** Initialization in progress
-**Next:** Complete setup, add submodules, create deployment specs
-**Maintained By:** Chromebook Orchestrator (Claude Code)
+## Critical Documentation
+
+**Must Read:**
+- **`WORKFLOW.md`** - Development methodology for all changes
+- **`repos/editor/specs/CODE-PRESERVATION-RULES.md`** - Editor modification constraints
+- **`repos/supabase/docs/APP-INTEGRATION-MAP.md`** - App/Supabase dependencies
+
+**Deployment:**
+- `deployment/STATUS.md` - Current deployment state
+- `deployment/web3studio/` - Staging deployment
+- `deployment/render/` - Production deployment
+
+**Monitoring:**
+- `monitoring/check-all.sh` - Health check script
+- `monitoring/logs/` - Deployment and change history
+
+---
+
+## Troubleshooting
+
+### Application Won't Start
+
+1. Check environment variables
+2. Check database connection (Supabase)
+3. Review recent commits
+4. Check Render/staging logs
+5. Test locally
+
+### Cross-Application Issues
+
+**Shared Auth Not Working:**
+- Verify same Supabase project/keys
+- Check CORS settings
+- Test each app independently
+
+**Edge Function Failures:**
+- Check `repos/supabase/docs/APP-INTEGRATION-MAP.md`
+- Verify Edge Function deployed
+- Check Supabase logs
+- Test Edge Function directly
+
+---
+
+## Support
+
+**Repositories:**
+- Editor: https://github.com/ydun-code-library/mundus-production
+- Digest: https://github.com/ydun-code-library/digest-production
+- Prompt Lab: https://github.com/ydun-code-library/prompt-lab
+- Supabase: https://github.com/ydun-code-library/mundus-supabase
+
+**Issues:** Use GitHub Issues in respective repositories
+**Orchestration:** Use mundus-final repo Issues for cross-repo coordination
+
+---
+
+**Last Updated:** 2025-11-20
+**Version:** 1.0.0
+**Maintained By:** Platform Team

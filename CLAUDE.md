@@ -1,410 +1,308 @@
-# Claude Code - Operating Instructions for Mundus Final
+# Claude Code - Mundus Orchestration Hub
 
-**Directory:** /home/jimmyb/m-e-p/mundus-final
-**Role:** Orchestration & Troubleshooting Hub
-**Operator:** Chromebook (Claude Code)
-**Machine:** Chromebook via Claude Code CLI
-
----
-
-## Purpose of This Directory
-
-**This is a META-ORCHESTRATION workspace** for managing 3 Mundus production applications during deployment and operation.
-
-**What you (Claude Code on Chromebook) do here:**
-- ✅ Coordinate deployments across 3 repos
-- ✅ Troubleshoot production issues
-- ✅ Create deployment specs
-- ✅ Monitor health of all 3 apps
-- ✅ Work with Beast via Tailscale for heavy tasks
-- ✅ Document issues and resolutions
-
-**What you do NOT do here:**
-- ❌ Write application features (do that in the production repos)
-- ❌ Modify Mansour/Johan's code directly
-- ❌ Make breaking changes without specs
+**Directory:** mundus-final
+**Purpose:** Coordinate deployment and troubleshooting for Mundus platform
+**Type:** Meta-orchestration workspace
 
 ---
 
-## The 3 Production Repositories
+## Purpose
+
+This directory coordinates 4 Mundus repositories:
+- **Editor** - Article management application
+- **Digest** - Daily digest automation
+- **Prompt Lab** - AI prompt testing tool
+- **Supabase** - Edge Functions and database management
+
+**What happens here:**
+- Coordinate deployments across repositories
+- Troubleshoot production issues
+- Monitor application health
+- Create deployment specifications
+- Document changes and decisions
+
+---
+
+## Repository Structure
+
+```
+mundus-final/
+├── repos/                  # Git submodules (4 repositories)
+│   ├── editor/            → mundus-production
+│   ├── digest/            → digest-production
+│   ├── prompt-lab/        → prompt-lab
+│   └── supabase/          → mundus-supabase
+│
+├── deployment/             # Deployment coordination
+│   ├── web3studio/        # Staging deployment
+│   ├── render/            # Production deployment
+│   └── STATUS.md          # Current deployment status
+│
+├── monitoring/             # Health checks
+│   ├── check-all.sh       # Check all applications
+│   └── logs/              # Deployment history
+│
+├── docs/                   # Orchestration guides
+│
+├── CLAUDE.md               # This file (AI assistant context)
+├── AGENTS.md               # Workflow and guidelines
+├── WORKFLOW.md             # Red/Green Checkpoint methodology
+└── README.md               # Overview
+```
+
+---
+
+## The 4 Repositories
 
 ### 1. Editor (repos/editor/)
-
-**Repository:** mundus-production (git submodule)
-**GitHub:** https://github.com/ydun-code-library/mundus-production
+**Repository:** mundus-production
 **Purpose:** Article management with AI writeup generation
 **Deployment:** Render.com ($7/month)
+**Developers:** Mansour (backend), Johan (frontend)
 
-**CRITICAL CONSTRAINTS:**
-- ⚠️ **Mansour's backend v3 = READ-ONLY**
-- ⚠️ **Johan's frontend = READ-ONLY**
-- ⚠️ If security fix needed: Comment old code + detailed notes
-- ⚠️ Read repos/editor/specs/CODE-PRESERVATION-RULES.md
-
-**What you CAN do:**
-- ✅ Add test files
-- ✅ Fix CRITICAL security issues (with documentation)
-- ✅ Update documentation
-- ✅ Troubleshoot deployment issues
-
-**What you CANNOT do:**
-- ❌ Refactor Mansour's code
-- ❌ Change Johan's component logic
-- ❌ Remove their console.log statements
-- ❌ Rename their variables
-
----
+**Important:** Backend v3 and frontend code should be modified carefully
+- Read `repos/editor/specs/CODE-PRESERVATION-RULES.md` before changes
+- Comment old code if security fixes needed
+- Add detailed notes for any modifications
 
 ### 2. Digest (repos/digest/)
-
-**Repository:** digest-production (git submodule)
-**GitHub:** https://github.com/ydun-code-library/digest-production
+**Repository:** digest-production
 **Purpose:** Daily digest automation with PDF/email
 **Deployment:** Render.com ($7/month)
+**Services:** digest-service + pdf-service bundled
 
-**Constraints:** ✅ NONE - We own this code
-
-**What you CAN do:**
-- ✅ Refactor freely
-- ✅ Optimize performance
-- ✅ Fix bugs
-- ✅ Add features
-- ✅ Change anything (just don't break functionality)
-
----
+**Constraints:** Can modify freely (self-contained codebase)
 
 ### 3. Prompt Lab (repos/prompt-lab/)
-
-**Repository:** prompt-lab (git submodule)
-**GitHub:** https://github.com/ydun-code-library/prompt-lab
+**Repository:** prompt-lab
 **Purpose:** AI prompt testing and optimization
 **Deployment:** Render.com ($7/month)
 
-**Constraints:** ✅ NONE - We own this code
+**Constraints:** Can modify freely
 
-**What you CAN do:**
-- ✅ Refactor freely
-- ✅ Optimize performance
-- ✅ Fix bugs
-- ✅ Add features
-- ✅ Change anything (just don't break functionality)
+### 4. Supabase (repos/supabase/)
+**Repository:** mundus-supabase
+**Purpose:** Edge Functions, database management
+**Deployment:** Supabase (managed service)
+
+**Critical:** Check `repos/supabase/docs/APP-INTEGRATION-MAP.md` before changes
+- Shows which apps use which Edge Functions
+- Prevents breaking apps with backend changes
 
 ---
 
-## How to Operate
+## Working from This Directory
 
 ### Starting a Session
 
 ```bash
-# Navigate to orchestration directory
-cd /home/jimmyb/m-e-p/mundus-final
+cd /path/to/mundus-final
 
-# Claude Code will auto-load this CLAUDE.md
-# Read AGENTS.md for current status and tasks
+# Check current status
+cat AGENTS.md
+cat deployment/STATUS.md
+
+# Check all apps health
+./monitoring/check-all.sh
 ```
 
-**Always check:**
-1. Read AGENTS.md for current deployment status
-2. Check deployment/STATUS.md for latest issues
-3. Review monitoring/logs/ for recent problems
+### Troubleshooting an Issue
 
----
-
-### Troubleshooting a Production Issue
-
-**Scenario:** Editor app has a bug in production
+**Example: Editor has a bug**
 
 ```bash
-# 1. Navigate to editor submodule
+# Navigate to editor
 cd repos/editor
 
-# 2. Pull latest
+# Pull latest
 git pull origin main
 
-# 3. Reproduce issue locally
-cd backend && npm run dev
-# OR
-cd frontend && npm run dev
+# Investigate using Claude Code tools
+# (Read, Grep, Bash, etc.)
 
-# 4. Identify root cause
-# Use Claude Code tools: Read, Grep, Bash, etc.
+# Create fix following WORKFLOW.md (RED→GREEN→CHECKPOINT)
 
-# 5. Create fix
-# If affects Mansour/Johan's code: Read CODE-PRESERVATION-RULES.md
-# If just config/docs: Fix directly
+# Test
+cd backend && npm test
 
-# 6. Test fix
-npm test
-
-# 7. Commit and push
+# Commit and push
 git add .
 git commit -m "fix: [description]"
 git push origin main
 
-# 8. Document in orchestration directory
-cd /home/jimmyb/m-e-p/mundus-final
-echo "[Date] - Editor - [Issue] - [Fix]" >> monitoring/logs/fixes.log
+# Document
+cd /path/to/mundus-final
+echo "[Date] Editor - [Issue] - [Fix]" >> monitoring/logs/fixes.log
 ```
 
----
-
-### Deploying to Beast for Testing
-
-**Use Beast via Tailscale:**
+### Updating Edge Functions
 
 ```bash
-# SSH to Beast from Chromebook
-ssh jamesb@beast
+# Navigate to Supabase repo
+cd repos/supabase
 
-# On Beast, pull latest
-cd ~/mundus-production && git pull origin main
-cd ~/digest-production && git pull origin main
-cd ~/prompt-lab && git pull origin main
+# Check integration map FIRST
+cat docs/APP-INTEGRATION-MAP.md
+# See which apps use this function
 
-# Deploy with Docker Compose
-docker-compose up -d
+# Make changes to Edge Function
 
-# Access via Cloudflare Tunnel
-# https://editor.web3studio.dev/
-# https://digest.web3studio.dev/
-# https://prompt-lab.web3studio.dev/
+# Deploy
+export SUPABASE_ACCESS_TOKEN=<token>
+npx supabase functions deploy <function-name> --no-verify-jwt
+
+# Test affected apps
+cd ../editor && npm test
+cd ../prompt-lab && npm test
+
+# Commit
+git add .
+git commit -m "fix: [description]"
+git push origin master
 ```
 
-**Create deployment spec from orchestration directory:**
+---
 
+## Deployment Workflow
+
+### Phase 1: Staging (web3studio.dev)
+
+**Purpose:** Test all applications before production
+
+**Staging URLs:**
+- https://editor.web3studio.dev/
+- https://digest.web3studio.dev/
+- https://prompt-lab.web3studio.dev/
+
+**Validation:**
+- All apps deploy successfully
+- Health checks passing
+- Shared authentication works
+- Cross-navigation works
+- All features functional
+
+### Phase 2: Production (Render.com)
+
+**Purpose:** Client-owned production deployment
+
+**Production URLs:**
+- https://mundus-editor.onrender.com/
+- https://mundus-digest.onrender.com/
+- https://mundus-prompt-lab.onrender.com/
+
+**Deployment:**
+1. Validate staging complete
+2. Connect GitHub repos to Render
+3. Configure environment variables
+4. Auto-deploy from main/master branches
+
+---
+
+## Critical Guidelines
+
+### Before Changing Code
+
+**Editor Repository:**
+1. Read `repos/editor/specs/CODE-PRESERVATION-RULES.md`
+2. Backend v3 and frontend require careful handling
+3. Comment old code if changes needed
+4. Add detailed notes explaining why
+
+**Supabase Repository:**
+1. Read `repos/supabase/docs/APP-INTEGRATION-MAP.md`
+2. Check which apps use the Edge Function
+3. Update ALL affected apps
+4. Test each app after deployment
+
+**Digest & Prompt Lab:**
+1. Can modify freely
+2. Follow WORKFLOW.md (RED→GREEN→CHECKPOINT)
+3. Don't break existing functionality
+
+---
+
+## Development Methodology
+
+**Follow WORKFLOW.md for all changes:**
+
+1. 🔴 **RED:** Implement the change
+2. 🟢 **GREEN:** Validate with tests and checks
+3. 🔵 **CHECKPOINT:** Commit and document
+
+**Never skip the GREEN phase.**
+
+---
+
+## Health Monitoring
+
+**Check all applications:**
 ```bash
-cd /home/jimmyb/m-e-p/mundus-final
-
-# Create spec in deployment/web3studio/
-cat > deployment/web3studio/DEPLOY-ALL-TO-BEAST.md <<EOF
-# Deploy All 3 Apps to Beast
-
-[Step-by-step instructions for Beast]
-EOF
-
-# Push spec
-git add deployment/
-git commit -m "deploy: Add Beast deployment spec"
-git push origin main
-
-# Beast pulls and executes
-```
-
----
-
-### Working with Beast
-
-**Via Tailscale:**
-- Chromebook can SSH: `ssh jamesb@beast`
-- Chromebook can access Beast Docker: `ssh jamesb@beast "docker ps"`
-
-**Via GitHub (Preferred):**
-- Chromebook creates spec → pushes to GitHub
-- Beast pulls spec → executes
-- Beast pushes results → Chromebook reviews
-
-**Communication Pattern:**
-```
-Chromebook (Strategic):
-- Analyze issue
-- Create detailed spec
-- Push to GitHub
-
-Beast (Execution):
-- Pull spec
-- Execute with Haiku 4.5
-- Push results
-
-Chromebook (Review):
-- Pull results
-- Validate quality
-- Approve or request iteration
-```
-
----
-
-## Critical Operating Rules
-
-### Rule 1: Never Modify Production Repos Directly from Here
-
-**WRONG:**
-```bash
-cd repos/editor
-# Make changes directly
-git commit && git push
-```
-
-**RIGHT:**
-```bash
-cd repos/editor
-# Read code, investigate issue
-# Return to orchestration directory
-cd /home/jimmyb/m-e-p/mundus-final
-# Create spec for fix
-# Push spec, let Beast execute or execute manually with care
-```
-
----
-
-### Rule 2: Respect Editor Code Preservation
-
-**ALWAYS check before modifying editor:**
-
-```bash
-cd repos/editor
-cat specs/CODE-PRESERVATION-RULES.md
-
-# If touching backend v3 or frontend:
-# - Comment old code
-# - Add detailed notes
-# - Minimal changes only
-# - Security fixes only
-```
-
----
-
-### Rule 3: Test on Beast Before Render
-
-**Deployment Flow:**
-1. ✅ Test locally on Chromebook (if light)
-2. ✅ Deploy to Beast (web3studio.dev)
-3. ✅ Validate all 3 apps work
-4. ✅ Check cross-navigation
-5. ✅ Check shared auth
-6. ✅ THEN deploy to Render.com
-
-**Never:**
-- ❌ Deploy directly to Render without Beast validation
-- ❌ Skip testing phase
-- ❌ Deploy unverified changes
-
----
-
-### Rule 4: Document Everything
-
-**After any deployment or fix:**
-
-```bash
-cd /home/jimmyb/m-e-p/mundus-final
-
-# Log the action
-echo "[2025-11-20] Editor - Fixed XSS vulnerability - Deployed to Beast - Validated OK" >> monitoring/logs/deployment-history.log
-
-# Update status
-# Edit deployment/STATUS.md with current state
-```
-
----
-
-## Tools Available
-
-**From Chromebook:**
-- ✅ Claude Code (you!) - Analysis, planning, specs
-- ✅ SSH to Beast - Heavy tasks, Docker deployments
-- ✅ GitHub - Coordination, version control
-- ✅ Tailscale - Secure access to Beast
-
-**From Beast (via Tailscale/SSH):**
-- ✅ Docker - Container builds and deployments
-- ✅ Haiku 4.5 - Execution of specs
-- ✅ Heavy processing - Builds, tests
-- ✅ Cloudflare Tunnel - web3studio.dev testing
-
----
-
-## Typical Session Workflow
-
-### Session Start
-
-```bash
-cd /home/jimmyb/m-e-p/mundus-final
-
-# Claude Code loads this CLAUDE.md automatically
-# Read current status
-cat AGENTS.md
-cat deployment/STATUS.md
-
-# Check health
 ./monitoring/check-all.sh
 ```
 
-### During Session
-
-- Troubleshoot issues as they arise
-- Create specs for fixes
-- Coordinate with Beast
-- Monitor deployments
-- Document changes
-
-### Session End
-
-```bash
-# Update status
-# Edit deployment/STATUS.md
-
-# Commit orchestration changes
-git add .
-git commit -m "session: [What was accomplished]"
-git push origin main
-```
-
----
-
-## Emergency Procedures
-
-### App Down on Render
-
-1. Check Render dashboard logs
-2. SSH to Beast and test there
-3. If Beast works, issue is Render-specific
-4. If Beast also fails, issue is in code
-5. Create hotfix spec
-6. Test on Beast
-7. Deploy to Render
-
-### Database Issue
-
-1. Check Supabase dashboard
-2. Check connection strings
-3. Test queries manually
-4. If all 3 apps affected: Database issue
-5. If 1 app affected: App configuration issue
-
-### Cross-App Issues
-
-1. Test shared auth (can user login to all 3?)
-2. Test shared database (do all 3 see same data?)
-3. Test cross-navigation (links work?)
-4. Document in monitoring/logs/cross-app-issues.log
-
----
-
-## Quick Reference
-
-**Health Checks:**
+**Manual checks:**
 ```bash
 curl https://editor.web3studio.dev/health
 curl https://digest.web3studio.dev/health
 curl https://prompt-lab.web3studio.dev/health
 ```
 
-**Beast Access:**
-```bash
-ssh jamesb@beast
-ssh jamesb@beast "docker ps"
-ssh jamesb@beast "cd ~/mundus-production && git status"
-```
+---
 
-**Repository Updates:**
+## Common Tasks
+
+### Deploy All Apps to Staging
+
+See `deployment/web3studio/DEPLOY-ALL.md` for complete guide.
+
+### Deploy to Render.com Production
+
+See `deployment/render/DEPLOY-CHECKLIST.md` for complete guide.
+
+### Update Documentation
+
+After any change:
 ```bash
-cd repos/editor && git pull origin main
-cd ../digest && git pull origin main
-cd ../prompt-lab && git pull origin master
+cd /path/to/mundus-final
+
+# Log the change
+echo "[Date] [Repo] - [Change]" >> monitoring/logs/changes.log
+
+# Update deployment status if needed
+# Edit deployment/STATUS.md
 ```
 
 ---
 
-**Remember:** You are the Orchestrator. Analyze, plan, coordinate. Let Beast execute heavy tasks.
+## Emergency Procedures
 
-**Last Updated:** 2025-11-20
-**Operator:** Chromebook (Claude Code)
+### Application Down
+
+1. Check health endpoint: `curl https://app-url/health`
+2. Check Render logs (Render dashboard)
+3. Check recent commits: `git log -5`
+4. Check if recent deploy: Review deployment/STATUS.md
+5. Rollback if needed: `git revert <commit>`
+
+### Supabase Issue
+
+1. Check Supabase dashboard status
+2. Check Edge Function logs
+3. Verify environment variables set
+4. Test Edge Function directly
+5. Review integration map for affected apps
+
+---
+
+## Documentation Structure
+
+**Always update after changes:**
+- `deployment/STATUS.md` - Current deployment state
+- `monitoring/logs/` - Change history
+- Each repo's documentation (if structure/API changes)
+
+---
+
+**This Directory:** Orchestration hub for client
+**Workflow:** Red/Green Checkpoint methodology
+**Support:** GitHub Issues in respective repositories
